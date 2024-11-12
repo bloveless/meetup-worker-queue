@@ -1,0 +1,26 @@
+version: '3'
+
+tasks:
+  server:
+    cmd: go run queue-worker/cmd/server
+    status:
+      - false # status false will always re-run the command the first time
+    sources:
+      - cmd/server/*.go
+
+  worker-high:
+    cmd: seq 10 | xargs -P10 -I {} go run queue-worker/cmd/worker high {}
+    status:
+      - false # status false will always re-run the command the first time
+    sources:
+      - cmd/worker/*.go
+
+  worker-low:
+    cmd: seq 2 | xargs -P2 -I {} go run queue-worker/cmd/worker low {}
+    status:
+      - false # status false will always re-run the command the first time
+    sources:
+      - cmd/worker/*.go
+
+  ls:
+    cmd: watch -n 1 nats s ls -a
